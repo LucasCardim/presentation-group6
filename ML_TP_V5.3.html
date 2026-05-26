@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science: Machine Learning no Trafego Pago</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F4F8;
+            color: #1A202C;
+            scroll-behavior: smooth;
+        }
+        .chart-container {
+            position: relative; width: 100%; margin: auto; height: 300px;
+        }
+        .chart-container-large { height: 350px; }
+        .chart-container-pie { height: 250px; }
+        
+        .card-shadow {
+            background: #FFFFFF;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border: 1px solid #E2E8F0;
+        }
+        .citation {
+            vertical-align: super; font-size: 0.7em; color: #E53E3E; font-weight: 700; cursor: pointer; margin-left: 2px;
+        }
+        .citation:hover { text-decoration: underline; }
+
+        /* Estilos PRISMA */
+        .funnel-step { position: relative; }
+        .funnel-arrow::after {
+            content: "➔"; position: absolute; right: -24px; top: 50%; transform: translateY(-50%); color: #A0AEC0; font-size: 1.25rem; z-index: 10;
+        }
+        @media (max-width: 768px) {
+            .funnel-arrow::after { content: "⬇"; right: auto; bottom: -24px; top: auto; left: 50%; transform: translateX(-50%); }
+        }
+
+        /* Estilos para Abas Interativas */
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-btn.active {
+            background-color: #2C5364; color: white; border-left: 4px solid #E53E3E; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .tab-btn:not(.active):hover { background-color: #E2E8F0; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased pb-20">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364] text-white py-16 px-6 md:px-12 lg:px-24 mb-10 border-b-[6px] border-[#E53E3E]">
+        <div class="max-w-7xl mx-auto flex flex-col justify-between items-start gap-8">
+            <div class="max-w-4xl">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight mt-2">
+                    Data Science: <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-[#E53E3E]">Machine Learning no Tráfego Pago</span>
+                </h1>
+                <p class="text-lg md:text-xl font-light text-gray-300 leading-relaxed mt-6">
+                    A transformação da compra de mídia digital: explorando a arquitetura dos algoritmos de leilão e o protagonismo do Cientista de Dados na era preditiva e <em>cookieless</em>.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 md:px-8 space-y-12">
+
+        <!-- PRISMA Methodology Section -->
+        <section>
+            <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 border-l-4 border-gray-400 pl-3">1. Rigor Metodológico (Protocolo PRISMA)</h2>
+            <div class="card-shadow rounded-xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-2">
+                <div class="bg-gray-50 p-4 rounded-lg w-full md:w-1/4 text-center border border-gray-200 funnel-step funnel-arrow">
+                    <p class="text-3xl font-black text-gray-800">542</p>
+                    <p class="text-xs text-gray-500 font-bold uppercase mt-1">Artigos Identificados</p>
+                    <p class="text-[10px] text-gray-400 mt-1">IEEE, ACM, Scopus, arXiv</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg w-full md:w-1/4 text-center border border-gray-200 funnel-step funnel-arrow">
+                    <p class="text-3xl font-black text-gray-800">128</p>
+                    <p class="text-xs text-gray-500 font-bold uppercase mt-1">Triagem (Screening)</p>
+                    <p class="text-[10px] text-gray-400 mt-1">Filtro de título, abstract e últimos 5 anos</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg w-full md:w-1/4 text-center border border-gray-200 funnel-step funnel-arrow">
+                    <p class="text-3xl font-black text-gray-800">45</p>
+                    <p class="text-xs text-gray-500 font-bold uppercase mt-1">Leitura Completa</p>
+                    <p class="text-[10px] text-gray-400 mt-1">Avaliação de qualidade e relevância</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg w-full md:w-1/4 text-center border-2 border-blue-400">
+                    <p class="text-3xl font-black text-blue-700">18</p>
+                    <p class="text-xs text-blue-600 font-bold uppercase mt-1">Seleção Final (Core)</p>
+                    <p class="text-[10px] text-blue-500 mt-1">Base para este mapeamento</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fundamentals of Paid Traffic and The Human Limit -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-4 card-shadow p-6 rounded-xl flex flex-col justify-center">
+                <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest border-l-4 border-blue-500 pl-3">2. Fundamentos: O Ecossistema de Mídia</h2>
+                <h3 class="text-2xl font-bold text-[#0F2027]">O que é Tráfego Pago?</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Tráfego pago refere-se à compra de espaços publicitários digitais através de sistemas de <strong>Real-Time Bidding (RTB)</strong>. Diferente da publicidade tradicional, o inventário digital é negociado dinamicamente em milissegundos. Quando um usuário carrega uma página, um leilão instantâneo ocorre para decidir qual anúncio exibir, baseado em lances e probabilidade de clique.
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-center flex flex-col justify-center">
+                        <div class="text-xl mb-1 text-blue-600 font-bold">G</div>
+                        <p class="text-[11px] font-bold text-gray-800">Google Ads</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-center flex flex-col justify-center">
+                        <div class="text-xl mb-1 text-blue-800 font-bold">f</div>
+                        <p class="text-[11px] font-bold text-gray-800">Meta Ads</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-center flex flex-col justify-center">
+                        <div class="text-xl mb-1 text-orange-500 font-bold">a</div>
+                        <p class="text-[11px] font-bold text-gray-800">Amazon Ads</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-center flex flex-col justify-center">
+                        <div class="text-xl mb-1 text-purple-600">⚙️</div>
+                        <p class="text-[11px] font-bold text-gray-800">DSPs</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-shadow p-6 rounded-xl bg-gradient-to-br from-[#1E293B] to-[#0F172A] text-white flex flex-col justify-center">
+                <h3 class="text-lg font-bold text-yellow-400 mb-4 border-b border-gray-700 pb-2">O Limite Humano</h3>
+                <p class="text-sm text-gray-300 leading-relaxed mb-5">
+                    Até 2017, gestores manipulavam lances de forma empírica e manual. Hoje, a otimização humana direta no leilão tornou-se estatisticamente impossível porque:
+                </p>
+                <ul class="text-sm text-gray-300 space-y-4">
+                    <li class="flex items-start">
+                        <span class="text-yellow-400 mr-3 text-lg">⚡</span>
+                        <span>Um leilão dura rigorosamente <strong>menos de 100 milissegundos</strong>.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-yellow-400 mr-3 text-lg">📊</span>
+                        <span>A IA avalia mais de <strong>70 milhões de sinais cruzados</strong> (device, horário, histórico) simultaneamente a cada impressão.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Impact KPIs from the literature -->
+        <section>
+            <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">3. O Impacto Mensurado da Ciência de Dados</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="card-shadow rounded-xl p-6 border-t-4 border-[#2C5364] text-center hover:-translate-y-1 transition-transform">
+                    <h3 class="text-3xl font-black text-[#2C5364] mb-1">+42%</h3>
+                    <p class="text-xs font-bold text-gray-600 uppercase">Aumento de ROAS</p>
+                    <p class="text-xs text-gray-500 mt-2">Ao treinar o algoritmo nativo com Value-Based Bidding (VBB).</p>
+                </div>
+                <div class="card-shadow rounded-xl p-6 border-t-4 border-[#2C5364] text-center hover:-translate-y-1 transition-transform">
+                    <h3 class="text-3xl font-black text-[#2C5364] mb-1">85%</h3>
+                    <p class="text-xs font-bold text-gray-600 uppercase">Lances Autônomos</p>
+                    <p class="text-xs text-gray-500 mt-2">Proporção do investimento de mídia operado por IA nas Big Techs.</p>
+                </div>
+                <div class="card-shadow rounded-xl p-6 border-t-4 border-[#E53E3E] text-center hover:-translate-y-1 transition-transform">
+                    <h3 class="text-3xl font-black text-[#E53E3E] mb-1">68%</h3>
+                    <p class="text-xs font-bold text-gray-600 uppercase">Perda de Sinal (ITP)</p>
+                    <p class="text-xs text-gray-500 mt-2">Bloqueio de cookies forçando o uso de Inferência Causal e APIs.</p>
+                </div>
+                <div class="card-shadow rounded-xl p-6 border-t-4 border-[#2C5364] text-center hover:-translate-y-1 transition-transform">
+                    <h3 class="text-3xl font-black text-[#2C5364] mb-1">-70%</h3>
+                    <p class="text-xs font-bold text-gray-600 uppercase">Trabalho Operacional</p>
+                    <p class="text-xs text-gray-500 mt-2">Redução no tempo de ajuste manual de campanhas (Bidding).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Under the Hood - Interactive Tabs (EQUALIZED HEIGHTS) -->
+        <section>
+            <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest border-l-4 border-yellow-400 pl-3 mb-6">4. Debaixo do Capô: Como a IA Toma Decisões (Interativo)</h2>
+            
+            <div class="flex flex-col md:flex-row gap-6 items-stretch">
+                <!-- Botões -->
+                <div class="w-full md:w-1/3 flex flex-col gap-3" id="algo-tabs">
+                    <button class="tab-btn active text-left px-5 py-4 rounded-lg bg-white border border-gray-200 text-sm font-bold shadow-sm flex-1" data-target="tab-pCvr">
+                        🎯 Predição de Conversão (pCVR)
+                        <span class="block text-xs font-normal text-gray-500 mt-1">XGBoost & Regressão Logística</span>
+                    </button>
+                    <button class="tab-btn text-left px-5 py-4 rounded-lg bg-white border border-gray-200 text-sm font-bold shadow-sm flex-1" data-target="tab-rl">
+                        💰 Estratégia de Lance (Bidding)
+                        <span class="block text-xs font-normal text-gray-500 mt-1">Reinforcement Learning</span>
+                    </button>
+                    <button class="tab-btn text-left px-5 py-4 rounded-lg bg-white border border-gray-200 text-sm font-bold shadow-sm flex-1" data-target="tab-knn">
+                        👥 Mapeamento de Audiência
+                        <span class="block text-xs font-normal text-gray-500 mt-1">KNN & Graph Neural Networks</span>
+                    </button>
+                    <button class="tab-btn text-left px-5 py-4 rounded-lg bg-white border border-gray-200 text-sm font-bold shadow-sm flex-1" data-target="tab-causal">
+                        📏 Medição sem Cookies
+                        <span class="block text-xs font-normal text-gray-500 mt-1">Inferência Causal & MMM</span>
+                    </button>
+                </div>
+
+                <!-- Conteúdo -->
+                <div class="w-full md:w-2/3 card-shadow rounded-xl p-8 bg-white flex flex-col justify-center">
+                    <!-- Tab 1 -->
+                    <div id="tab-pCvr" class="tab-content active">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl">🎯</span>
+                            <h3 class="text-2xl font-bold text-[#0F2027]">Cálculo da Probabilidade de Conversão (pCVR)</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+                            Antes de dar um lance, a plataforma precisa responder: <em>"Qual a chance matemática dessa pessoa comprar se clicar no anúncio?"</em></p>
+                        <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-4">
+                            <h4 class="font-bold text-sm text-[#2C5364] mb-2">A Matemática:</h4>
+                            <p class="text-xs text-gray-600">Modelos como XGBoost processam features em tempo real (ex: contexto da página, similaridade de comportamento). A saída é um score (ex: 0.02 = 2% de chance).</p>
+                        </div>
+                        <p class="text-xs font-bold text-[#E53E3E] uppercase tracking-wide">💡 Ação do Cientista de Dados:</p>
+                        <p class="text-xs text-gray-600 mt-1">Fornecer <em>First-party data</em> via APIs (CAPI). Ensinar o algoritmo quem realmente comprou offline ajusta os pesos da rede e melhora o pCVR global.</p>
+                    </div>
+                    <!-- Tab 2 -->
+                    <div id="tab-rl" class="tab-content">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl">💰</span>
+                            <h3 class="text-2xl font-bold text-[#0F2027]">Reinforcement Learning no Leilão</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+                            Sabendo a chance de conversão, quanto dinheiro oferecer no leilão sem estourar o orçamento do dia?</p>
+                        <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-4">
+                            <h4 class="font-bold text-sm text-[#2C5364] mb-2">A Matemática:</h4>
+                            <p class="text-xs text-gray-600">O sistema atua como um "Agente". Ele recebe recompensa positiva se vencer o leilão e gerar venda rentável, e penalidade se pagar caro. A equação base: <code>Lance = pCTR × pCVR × Valor Esperado</code>.</p>
+                        </div>
+                        <p class="text-xs font-bold text-[#E53E3E] uppercase tracking-wide">💡 Ação do Cientista de Dados:</p>
+                        <p class="text-xs text-gray-600 mt-1">Configurar <em>Value-Based Bidding (VBB)</em>. Injetar sinais de lucro (Margin/LTV) muda a "função de recompensa" do agente, focando em clientes rentáveis.</p>
+                    </div>
+                    <!-- Tab 3 -->
+                    <div id="tab-knn" class="tab-content">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl">👥</span>
+                            <h3 class="text-2xl font-bold text-[#0F2027]">Expansão de Público (Lookalikes)</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+                            Como encontrar clientes que não conhecem sua marca, mas têm alta propensão de compra?</p>
+                        <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-4">
+                            <h4 class="font-bold text-sm text-[#2C5364] mb-2">A Matemática:</h4>
+                            <p class="text-xs text-gray-600">Uso de Algoritmos KNN. Usuários são convertidos em vetores matemáticos (Embeddings). Se os melhores clientes formam um "cluster", o algoritmo busca usuários desconhecidos que estejam geometricamente próximos desse ponto.</p>
+                        </div>
+                        <p class="text-xs font-bold text-[#E53E3E] uppercase tracking-wide">💡 Ação do Cientista de Dados:</p>
+                        <p class="text-xs text-gray-600 mt-1"><em>Feature Engineering</em>. Em vez de enviar "todos que compraram", modelar um cluster refinado: "Compra + Recência < 30 dias + Sem ticket aberto no SAC".</p>
+                    </div>
+                    <!-- Tab 4 -->
+                    <div id="tab-causal" class="tab-content">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl">📏</span>
+                            <h3 class="text-2xl font-bold text-[#0F2027]">Inferência Causal e MMM</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+                            Com bloqueadores de rastreamento (ITP), como provar que o anúncio causou a venda?</p>
+                        <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-4">
+                            <h4 class="font-bold text-sm text-[#2C5364] mb-2">A Matemática:</h4>
+                            <p class="text-xs text-gray-600">Media Mix Modeling (MMM) usa modelos Bayesianos macro para correlacionar picos de investimento com vendas totais. Geo-Experiments usam "Controles Sintéticos" (ex: desligar ads em SP e comparar com a curva de vendas do RJ).</p>
+                        </div>
+                        <p class="text-xs font-bold text-[#E53E3E] uppercase tracking-wide">💡 Ação do Cientista de Dados:</p>
+                        <p class="text-xs text-gray-600 mt-1">Projetar, rodar e medir experimentos de Incrementality. É a habilidade mais escassa e valiosa no mercado atual (Causal ML).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Taxonomy Clusters and Scatter Chart (EQUALIZED HEIGHTS) -->
+        <section class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
+            
+            <!-- Coluna Esquerda: Texto -->
+            <div class="lg:col-span-2 flex flex-col">
+                <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest border-l-4 border-green-500 pl-3 mb-6">5. Taxonomia da Literatura</h2>
+                <div class="card-shadow rounded-xl p-6 flex flex-col flex-1">
+                    <h3 class="text-xl font-bold text-[#0F2027] mb-4">Clusters de Pesquisa (SLR)</h3>
+                    <p class="text-sm text-gray-600 mb-6">A análise bibliométrica revelou 4 grandes áreas de concentração no desenvolvimento algorítmico:</p>
+                    
+                    <ul class="space-y-4 flex-1">
+                        <li class="border-l-4 border-blue-500 pl-3">
+                            <h4 class="font-bold text-sm text-gray-800">1. Algoritmos de Bidding (35%)</h4>
+                            <p class="text-xs text-gray-500">Otimização de lances evoluindo para Deep Reinforcement Learning.</p>
+                        </li>
+                        <li class="border-l-4 border-green-500 pl-3">
+                            <h4 class="font-bold text-sm text-gray-800">2. Privacidade e Causalidade (30%)</h4>
+                            <p class="text-xs text-gray-500">Media Mix Modeling (Bayesiano) e Controles Sintéticos (Cookieless).</p>
+                        </li>
+                        <li class="border-l-4 border-purple-500 pl-3">
+                            <h4 class="font-bold text-sm text-gray-800">3. GenAI para Criativos (20%)</h4>
+                            <p class="text-xs text-gray-500">Geração de Ad Copy dinâmico utilizando LLMs multi-modais.</p>
+                        </li>
+                        <li class="border-l-4 border-orange-500 pl-3">
+                            <h4 class="font-bold text-sm text-gray-800">4. Targeting e Atribuição (15%)</h4>
+                            <p class="text-xs text-gray-500">Mapeamento vetorial (Embeddings) e Atribuição Shapley.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Coluna Direita: Gráfico -->
+            <div class="lg:col-span-3 flex flex-col">
+                <h2 class="text-sm font-bold text-[#F0F4F8] uppercase tracking-widest invisible mb-6">Spacing</h2>
+                <div class="card-shadow rounded-xl p-6 flex flex-col flex-1">
+                    <h3 class="text-xl font-bold text-[#0F2027] mb-2">Paisagem de Modelos: Complexidade vs Impacto</h3>
+                    <p class="text-xs text-gray-500 mb-4">Tamanho da bolha indica o volume relativo de publicações encontradas na SLR.</p>
+                    <div class="chart-container flex-1 min-h-[300px]">
+                        <canvas id="scatterChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Line Chart and Doughnut Comparisons -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            <div class="card-shadow rounded-xl p-6 md:p-8 flex flex-col">
+                <h3 class="text-xl font-bold text-[#0F2027] mb-2">Evolução do ROI a Longo Prazo</h3>
+                <p class="text-gray-500 text-xs mb-6 border-b pb-4">
+                    Comparativo da trajetória de ROAS entre gestão manual, Black-box e Data Science customizada.</p>
+                <div class="chart-container chart-container-large flex-1">
+                    <canvas id="roiChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card-shadow rounded-xl p-6 md:p-8 flex flex-col">
+                <h3 class="text-xl font-bold text-[#0F2027] mb-2">Mudança de Paradigma: Tempo do Analista</h3>
+                <p class="text-gray-500 text-xs mb-6 border-b pb-4">
+                    Deslocamento da operação da interface para a engenharia de infraestrutura (Back-end Ads).</p>
+                <div class="chart-container chart-container-pie flex-1 mt-4">
+                    <canvas id="timeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusions and Gaps Section -->
+        <section class="bg-[#0F2027] text-white rounded-2xl p-8 md:p-10 card-shadow border-l-8 border-yellow-400">
+            <h2 class="text-sm font-bold text-yellow-400 uppercase tracking-widest mb-6">6. Conclusões da Pesquisa e Direções Futuras</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <!-- Principais Conclusões -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-white">Síntese dos Artigos Analisados</h3>
+                    <div class="space-y-5">
+                        <div class="bg-white/5 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-blue-300 text-sm mb-1">I. First-Party Data é a Nova Vantagem</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed">O diferencial não é mais "configurar a campanha", mas a qualidade dos dados de negócio injetados via Conversion APIs para treinar a IA da plataforma.</p>
+                        </div>
+                        <div class="bg-white/5 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-orange-300 text-sm mb-1">II. O Fim da Atribuição Linear</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed">Modelos de "último clique" estão obsoletos. A academia convergiu para métodos de medição causal e agregada (Media Mix Modeling).</p>
+                        </div>
+                        <div class="bg-white/5 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-purple-300 text-sm mb-1">III. Gargalo Criativo Resolvido por GenAI</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed">LLMs e CNNs assumiram a extração de features e a geração em massa de criativos otimizados para combater o desgaste de audiência.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lacunas -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-white">Lacunas em Aberto (Research Gaps)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-xl">
+                            <div class="text-2xl mb-2">⏱️</div>
+                            <h4 class="font-bold text-yellow-400 text-sm mb-1">Latência de LLMs no RTB</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">Modelos de linguagem são lentos para operar em leilões de < 100ms. Faltam pesquisas em destilação de modelos para Ads.</p>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-xl">
+                            <div class="text-2xl mb-2">🕵️‍♂️</div>
+                            <h4 class="font-bold text-yellow-400 text-sm mb-1">Privacidade Criptográfica</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">Como cruzar dados de CRM com Meta sem expor PII? Homomorphic Encryption e Federated Learning em Ads ainda são raros.</p>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-xl">
+                            <div class="text-2xl mb-2">📉</div>
+                            <h4 class="font-bold text-yellow-400 text-sm mb-1">Paradoxo do "Cold Start"</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">Agentes de RL queimam dinheiro "aprendendo" em contas novas. Faltam frameworks sólidos de Transfer Learning inter-contas.</p>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-xl">
+                            <div class="text-2xl mb-2">⚖️</div>
+                            <h4 class="font-bold text-yellow-400 text-sm mb-1">Viés de Target (Fairness)</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">Lookalikes excluem minorias de ofertas vantajosas (crédito/imóveis) por buscarem apenas o cluster mais rentável.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Full References List -->
+        <section class="mt-16 pt-8 border-t-2 border-gray-200">
+            <h2 class="text-xl font-bold text-[#0F2027] mb-6">Referências Bibliográficas (Corpus Central)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-xs text-gray-600 leading-relaxed">
+                <div>
+                    <ul class="space-y-3">
+                        <li><strong>[1]</strong> MCMAHAN, H. B. et al. Ad click prediction: a view from the trenches. In: Proceedings of the 19th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, p. 1222-1230, 2013. DOI: <a href="https://doi.org/10.1145/2487575.2488200" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/2487575.2488200</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[2]</strong> HE, X. et al. Practical lessons from predicting clicks on ads at Facebook. In: Proceedings of the Eighth International Workshop on Data Mining for Online Advertising (ADKDD'14), p. 1-9, 2014. DOI: <a href="https://doi.org/10.1145/2648584.2648589" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/2648584.2648589</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[3]</strong> CHAPELLE, O.; MANAVOGLU, E.; ROSALES, R. Simple and scalable response prediction for display advertising. ACM Transactions on Intelligent Systems and Technology, v. 5, n. 4, p. 1-34, 2014. DOI: <a href="https://doi.org/10.1145/2532128" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/2532128</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[4]</strong> GHARIBSHAH, Z.; ZHU, X. User response prediction in online advertising: A comprehensive review. ACM Computing Surveys, v. 54, n. 3, p. 64:1-64:43, 2021. DOI: <a href="https://doi.org/10.1145/3446662" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/3446662</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[5]</strong> YANG, Y.; ZHAI, P. Click-through rate prediction in online advertising: A literature review. arXiv preprint arXiv:2202.10462, 2022. DOI: <a href="https://doi.org/10.48550/arXiv.2202.10462" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.2202.10462</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[6]</strong> JIN, J. et al. Deep reinforcement learning for sponsored search real-time bidding. In: Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining, p. 407-416, 2018. DOI: <a href="https://doi.org/10.1145/3320496.3320500" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/3320496.3320500</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[7]</strong> OU, W. et al. A survey on bid optimization in real-time bidding display advertising. ACM Transactions on Knowledge Discovery from Data, v. 18, n. 3, p. 58:1-58:31, 2024. DOI: <a href="https://doi.org/10.1145/3628603" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/3628603</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[8]</strong> PAN, S. et al. Bid shading by win-rate estimation and surplus maximization. arXiv preprint arXiv:2009.09259, 2020. DOI: <a href="https://doi.org/10.48550/arXiv.2009.09259" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.2009.09259</a>. Acesso em: 25 maio 2026.</li>
+			<li><strong>[9]</strong> ZHOU, T. et al. An efficient deep distribution network for bid shading in first-price auctions. In: Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining, p. 3996-4004, 2021. DOI: <a href="https://doi.org/10.48550/arXiv.2107.06650" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.2107.06650</a>. Acesso em: 25 maio 2026.</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="space-y-3">
+                        <li><strong>[10]</strong> WANG, H. et al. ROI-constrained bidding via curriculum-guided Bayesian reinforcement learning. In: Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, p. 4021-4031, 2022. DOI: <a href="https://doi.org/10.1145/3534678.3539211" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/3534678.3539211</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[11]</strong> WANG, J.; ZHANG, W.; YUAN, S. Display advertising with real-time bidding (RTB) and behavioural targeting. arXiv preprint arXiv:1610.03013, 2016. DOI: <a href="https://doi.org/10.48550/arXiv.1610.03013" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.1610.03013</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[12]</strong> Causally driven incremental multi touch attribution using a recurrent neural network. In: Proceedings of the AdKDD'19 Conference, p. 1-6, 2019. DOI: <a href="https://doi.org/10.48550/arXiv.1902.00215" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.1902.00215</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[13]</strong> DCRMTA: Unbiased causal representation for multi-touch attribution. arXiv preprint arXiv:2401.08875, 2024. DOI: <a href="https://doi.org/10.48550/arXiv.2401.08875" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.2401.08875</a>. Acesso em: 25 maio 2026.</li>
+                        <br>
+			<li><strong>[14]</strong> MORAES, F. et al. Uplift modeling: from causal inference to personalization. In: Proceedings of the 32nd ACM International Conference on Information and Knowledge Management, p. 5212-5215, 2023. DOI: <a href="https://doi.org/10.1145/3583780.3615298" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/3583780.3615298</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[15]</strong> LIU, X. et al. Audience look-alike targeting. In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining, 2019. DOI: <a href="https://doi.org/10.1145/3292500.3330714" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.1145/3292500.3330714</a>. Acesso em: 25 maio 2026.</li>
+                        <li><strong>[16]</strong> PENG, Y.; LIU, C.; SHEN, W. Finding lookalike customers for e-commerce marketing. arXiv preprint arXiv:2301.03147, 2023. DOI: <a href="https://doi.org/10.48550/arXiv.2301.03147" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.2301.03147</a>. Acesso em: 25 maio 2026.</li>
+			<br>
+			<li><strong>[17]</strong> WU, C. et al. FedCTR: Federated native ad CTR prediction with multi-platform user behavior data. arXiv preprint arXiv:2007.12135, 2020. DOI: <a href="https://doi.org/10.48550/arXiv.2007.12135" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.2007.12135</a>. Acesso em: 25 maio 2026.</li>
+			<li><strong>[18]</strong> TIAN, Z. et al. FedUD: Federated CTR prediction with unaligned data. arXiv preprint arXiv:2407.18472, 2024. DOI: <a href="https://doi.org/10.48550/arXiv.2407.18472" target="_blank" class="text-blue-500 hover:underline">https://doi.org/10.48550/arXiv.2407.18472</a>. Acesso em: 25 maio 2026.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-8 text-center mt-12 border-t-4 border-[#2C5364]">
+        <p class="text-sm font-bold text-gray-200">Grupo 6 (Feijoada) : Arthur, Eduardo, João Vitor, Lucas e Renê, </p>
+	<p class="text-xs mt-2 font-mono text-gray-500"><strong>Para a Disciplina MPC-007 - Produção de Textos Acadêmicos-Científicos I </strong></p>
+	<p class="text-xs mt-2 font-mono text-gray-500"><strong>FATEC Adamantina - Curso Superior de Tecnologia em Ciência de Dados</strong></p>
+	<br>
+	<p class="text-sm font-bold text-gray-200">Painel Interativo de Apresentação</p>
+    	<p class="text-xs mt-2 font-mono text-gray-500"><strong>Renderização: HTML5/CSS3/Vanilla JS & Chart.js</strong></p>
+    
+    	<div class="mt-6 flex flex-wrap items-center justify-center text-xs text-gray-400">
+        <a href="https://example.com" class="text-[#3E92CC] hover:text-blue-300 transition-colors mr-1"></a> 
+        &copy; 1999 by 
+        <a href="https://example.com" class="text-[#3E92CC] hover:text-blue-300 transition-colors mx-1">Lucas Cardim</a> 
+         - licensed under 
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer" class="text-[#3E92CC] hover:text-blue-300 transition-colors ml-1 mr-2">
+            CC BY-NC-SA 4.0
+        </a>
+        <span class="inline-flex items-center bg-gray-200 rounded px-1.5 py-0.5">
+            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="CC" style="max-width: 1.2em; max-height:1.2em; margin-left:.2em;">
+            <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="BY" style="max-width: 1.2em; max-height:1.2em; margin-left:.2em;">
+            <img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="NC" style="max-width: 1.2em; max-height:1.2em; margin-left:.2em;">
+            <img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="SA" style="max-width: 1.2em; max-height:1.2em; margin-left:.2em;">
+        </span>
+    </div>
+	    </footer>
+
+    <!-- JavaScript execution for Tabs and Charts -->
+    <script>
+        // Lógica das Abas Interativas
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    const targetId = btn.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+        });
+
+        // Configuração Chart.js
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.color = '#718096';
+
+        // Gráfico de Dispersão (Taxonomia)
+        const ctxScatter = document.getElementById('scatterChart').getContext('2d');
+        new Chart(ctxScatter, {
+            type: 'bubble',
+            data: {
+                datasets: [
+                    { label: 'Heurísticas Manuais', data: [{x: 2, y: 3, r: 10}], backgroundColor: 'rgba(160, 174, 192, 0.6)', borderColor: '#718096' },
+                    { label: 'Regressão / XGBoost (Bidding)', data: [{x: 4, y: 6, r: 25}], backgroundColor: 'rgba(66, 153, 225, 0.7)', borderColor: '#3182CE' },
+                    { label: 'Media Mix Modeling', data: [{x: 6, y: 7, r: 18}], backgroundColor: 'rgba(72, 187, 120, 0.7)', borderColor: '#38A169' },
+                    { label: 'Reinforcement Learning (RL)', data: [{x: 8.5, y: 8.5, r: 15}], backgroundColor: 'rgba(237, 137, 54, 0.8)', borderColor: '#DD6B20' },
+                    { label: 'LLMs para Criativos', data: [{x: 7.5, y: 9.5, r: 12}], backgroundColor: 'rgba(159, 122, 234, 0.8)', borderColor: '#805AD5' },
+                    { label: 'Homomorphic Encryption', data: [{x: 9.5, y: 5, r: 6}], backgroundColor: 'rgba(229, 62, 62, 0.8)', borderColor: '#C53030' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } },
+                scales: {
+                    x: { title: { display: true, text: 'Complexidade Computacional', font: {weight: 'bold'} }, min: 0, max: 12, grid: { color: '#EDF2F7' } },
+                    y: { title: { display: true, text: 'Impacto no Negócio / ROAS', font: {weight: 'bold'} }, min: 0, max: 12, grid: { color: '#EDF2F7' } }
+                }
+            }
+        });
+
+        // Gráfico de ROI Evolutivo
+        const ctxRoi = document.getElementById('roiChart').getContext('2d');
+        new Chart(ctxRoi, {
+            type: 'line',
+            data: {
+                labels: ['Mês 1', 'Mês 2', 'Mês 3', 'Mês 4', 'Mês 5', 'Mês 6', 'Mês 7', 'Mês 8', 'Mês 9', 'Mês 10', 'Mês 11', 'Mês 12'],
+                datasets: [
+                    { label: 'Heurística / Manual', data: [1.2, 1.3, 1.25, 1.4, 1.35, 1.4, 1.45, 1.4, 1.5, 1.45, 1.5, 1.55], borderColor: '#A0AEC0', borderWidth: 2, borderDash: [5, 5], fill: false, tension: 0.4 },
+                    { label: 'Smart Bidding (Black-box)', data: [1.2, 1.4, 1.8, 2.1, 2.3, 2.5, 2.6, 2.65, 2.7, 2.8, 2.75, 2.85], borderColor: '#3182CE', borderWidth: 3, fill: false, tension: 0.4 },
+                    { label: 'DS Customizado (VBB Preditivo)', data: [1.2, 1.4, 1.7, 2.2, 2.8, 3.4, 4.1, 4.6, 5.2, 5.8, 6.5, 7.1], borderColor: '#E53E3E', borderWidth: 4, backgroundColor: 'rgba(229, 62, 62, 0.1)', fill: true, tension: 0.4 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: { size: 11 } } } },
+                scales: {
+                    y: { title: { display: true, text: 'Retorno Sobre Investimento (ROAS)' }, grid: { color: '#EDF2F7' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Gráfico de Tempo (Doughnut)
+        const ctxTime = document.getElementById('timeChart').getContext('2d');
+        new Chart(ctxTime, {
+            type: 'doughnut',
+            data: {
+                labels: ['Engenharia de Dados (APIs/ETL)', 'Modelagem Preditiva (LTV)', 'Inferência Causal / Testes', 'Ajustes na Interface (Ads)'],
+                datasets: [{
+                    data: [42, 32, 21, 5],
+                    backgroundColor: ['#2C5364', '#3182CE', '#ECC94B', '#A0AEC0'],
+                    borderWidth: 2, borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '65%',
+                plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 15 } } }
+            }
+        });
+    </script>
+</body>
+</html>
